@@ -9,3 +9,7 @@ Terraform handles the creation of the RDS instance, the VPC, security groups, S3
 ## Usage
 Install **Terraform** and **kOps**, then execute the start_cluster.sh script in **kubernetes_cluster**.
 Services can then be loaded to the k8s cluster with start_services.sh.
+
+## TODO
+- Implement actual services (like ML demos)
+- Use GitHub actions to update them when needed
