@@ -4,7 +4,7 @@ module "dev_vpc" {
   name               = local.vpc_name
   cidr               = "172.20.0.0/16"
   azs                = local.azs
-  #private_subnets    = ["10.0.1.0/24"]
+  //private_subnets    = ["10.0.1.0/24"]
   public_subnets     = ["172.20.100.0/24", "172.20.101.0/24"]
   //Disable NAT Gateway, which costs 4.5 cents/hour
   enable_nat_gateway = false
@@ -22,9 +22,9 @@ module "dev_vpc" {
   }
 
   // Comment private subnet because it uses a NAT Gateway, which costs 4.5 cents/hour
-  #private_subnet_tags = {
-  #  "kubernetes.io/role/internal-elb" = true
-  #}
+  //private_subnet_tags = {
+  //  "kubernetes.io/role/internal-elb" = true
+  //}
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = true
