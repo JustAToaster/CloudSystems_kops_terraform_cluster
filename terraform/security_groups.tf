@@ -20,13 +20,13 @@ resource "aws_security_group" "k8s_common_http" {
 
 }
 
-# Security group for accessing services through nodes
+// Security group for accessing services through nodes
 resource "aws_security_group" "nodes_k8s_services" {
   name   = "${local.environment}_k8s_services"
   vpc_id = module.dev_vpc.vpc_id
   tags   = "${merge(local.tags)}"
 
-  # Allow access to services
+  // Allow access to services
   ingress {
     from_port   = 30000
     protocol    = "tcp"
