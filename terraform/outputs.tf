@@ -70,6 +70,15 @@ output "rds_port" {
   value = aws_db_instance.projdb.port
 }
 
+output "db_username" {
+  value = local.db_username
+}
+
+output "db_password" {
+  sensitive = true
+  value = local.db_password
+}
+
 // Kops data
 
 output "kops_s3_bucket" {

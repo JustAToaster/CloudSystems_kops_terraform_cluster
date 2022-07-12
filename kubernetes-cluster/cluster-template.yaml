@@ -15,18 +15,21 @@ spec:
   configBase: s3://{{.kops_s3_bucket.value}}/{{.kubernetes_cluster_name.value}}
   # Create one etcd member in the AZ where the master(s) is/are
   etcdClusters:
+  {{ $count_masters := ($.num_masters.value | int) }}
+  {{- range until $count_masters }}
   - cpuRequest: 200m
     etcdMembers:
-    - instanceGroup: master-{{.master_az.value}}
-      name: {{.master_az.value | replace $.region.value "" }}
+    - instanceGroup: master{{.}}-{{$.master_az.value}}
+      name: {{$.master_az.value | replace $.region.value "" }}
     memoryRequest: 100Mi
     name: main
   - cpuRequest: 100m
     etcdMembers:
-    - instanceGroup: master-{{.master_az.value}}
-      name: {{.master_az.value | replace $.region.value "" }}
+    - instanceGroup: master{{.}}-{{$.master_az.value}}
+      name: {{$.master_az.value | replace $.region.value "" }}
     memoryRequest: 100Mi
     name: events
+  {{end}}
   iam:
     allowContainerRegistry: true
     legacy: false

@@ -31,8 +31,9 @@ export KOPS_STATE_STORE="s3://$(jq -r .kops_s3_bucket.value values.json)"
 echo $CLUSTER_NAME
 echo $KOPS_STATE_STORE
 
-echo "----------- 6. Generating cluster.yaml from template and terraform values -----------"
+echo "----------- 6. Generating cluster.yaml and service YAMLs from template and terraform values -----------"
 kops toolbox template --name $CLUSTER_NAME --values values.json --template ../kubernetes-cluster/cluster-template.yaml --format-yaml > cluster.yaml
+kops toolbox template --values values.json --template ../kubernetes-cluster/services_templates/helmet_detector_template.yaml --format-yaml > ../kubernetes-cluster/services/helmet_detector.yaml
 echo "Done."
 
 echo "----------- 7. Creating cluster with cluster.yaml configuration -----------"
@@ -49,16 +50,19 @@ kops update cluster --state $KOPS_STATE_STORE --name $CLUSTER_NAME --yes
 kops export kubecfg --name $CLUSTER_NAME --state $KOPS_STATE_STORE --admin=8670h0m0s
 echo "Done."
 
-# echo "----------- 10. Rolling update and validating cluster -----------"
+echo "----------- 10. Rolling update and validating cluster -----------"
 # Rolling update often needed to make sure all nodes join the cluster and the configuration is updated
 # It is really wonky, sometimes it just does not work and I have to restart it multiple times.
-# kops rolling-update cluster --cloudonly --state $KOPS_STATE_STORE --force --yes
+kops rolling-update cluster --cloudonly --state $KOPS_STATE_STORE --force --yes
+# Validation does not end because some default stuff is not installed. It should be an issue with t2.micro instances.
 # kops validate cluster --state $KOPS_STATE_STORE --wait 10m
 
 echo "----------- DONE -----------"
+echo "If some nodes do not show up after 15 minutes, do another rolling update."
 
-# To connect to RDS instance and use MySQL, use the following command in the terraform folder (with the proper username), then put the password when asked.
-# mysql -h $(terraform output -raw rds_address) -P $(terraform output -raw rds_port) -u username -p
+# Connect to RDS instance to create the tables
+echo "----------- Connecting to the RDS instance to create tables -----------"
+mysql -h $(terraform output -raw rds_address) -P $(terraform output -raw rds_port) -u $(terraform output -raw db_username) -p$(terraform output -raw db_password) -e "CREATE DATABASE yolov5_predictions;CREATE TABLE yolov5_predictions.requests (Address varchar(255),ImageName varchar(255),JsonPredictions varchar(5000));"
 
 # You can connect to the EC2 instances with:
 # ssh ubuntu@ec2-[public_ip].compute-1.amazonaws.com

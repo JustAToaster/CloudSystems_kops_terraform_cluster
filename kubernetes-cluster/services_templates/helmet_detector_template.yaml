@@ -1,0 +1,58 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: helmet-app
+  labels:
+    app: helmet
+spec:
+  containers:
+    - name: helmet-app
+      image: justatoaster64/yolov5-helmet-detector
+      env:
+      - name: DB_HOSTNAME
+        value: {{$.rds_address.value}}
+      - name: DB_USERNAME
+        value: {{$.db_username.value}}
+      - name: DB_PASSWORD
+        value: {{$.db_password.value}}
+      resources:
+        requests:
+          ephemeral-storage: "2Gi"
+        limits:
+          ephemeral-storage: "2Gi"
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: helmet-service
+spec:
+  selector:
+    app: helmet
+  type: NodePort
+  ports:
+    - port: 5678 # Default port for image
+      nodePort: 32332
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: helmet-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - http:
+        paths:
+          - path: /helmet
+            pathType: Prefix
+            backend:
+              service:
+                name: helmet-service
+                port: 
+                  number: 5678

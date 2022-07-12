@@ -2,7 +2,7 @@
 locals {
   num_masters = 1
   //Number of nodes per subnet
-  num_nodes = 2
+  num_nodes = 1
 }
 
 //Master(s) configuration
@@ -21,7 +21,7 @@ locals {
   //Same image, machine type and volume size for all instances
   nodes_image_id = "099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220615"
   nodes_machine_type = "t2.micro"
-  nodes_volume_size = 8
+  nodes_volume_size = 10
   //Max and min size for autoscaling group
   nodes_max_size = 1
   nodes_min_size = 1
