@@ -31,7 +31,7 @@ spec:
     app: helmet
   type: NodePort
   ports:
-    - port: 5678 # Default port for image
+    - port: 32332
       nodePort: 32332
 
 ---
@@ -55,4 +55,4 @@ spec:
               service:
                 name: helmet-service
                 port: 
-                  number: 5678
+                  number: 32332
