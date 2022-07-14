@@ -12,6 +12,8 @@ terraform {
 
 locals {
   azs                    = ["us-east-1a", "us-east-1b"]
+  //Because of free tier limitations (bandwidth between AZs), the nodes will actually be created in the same AZ as the master and the RDS instance
+  nodes_azs                    = ["us-east-1a"]
   master_az                    = "us-east-1a"
   environment            = "dev-kops-proj"
   kops_state_bucket_name = "kops-config-s3"

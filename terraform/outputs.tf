@@ -48,6 +48,10 @@ output "availability_zones" {
   value = local.azs
 }
 
+output "nodes_availability_zones" {
+  value = local.nodes_azs
+}
+
 output "common_http_sg_id" {
   value = aws_security_group.k8s_common_http.id
 }

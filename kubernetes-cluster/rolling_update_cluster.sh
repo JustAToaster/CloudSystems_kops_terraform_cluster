@@ -4,6 +4,7 @@ set -e -o pipefail
 
 echo "----------- 1. Go to terraform folder -----------"
 cd ../terraform
+echo "Done."
 
 echo "----------- 2. Get kubernetes_cluster_name and kops_s3_bucket values with jq -----------"
 export CLUSTER_NAME="$(jq -r .kubernetes_cluster_name.value values.json)"

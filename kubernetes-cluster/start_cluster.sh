@@ -64,6 +64,6 @@ echo "If some nodes do not show up after 10 minutes, do a rolling update with ./
 # Create the tables used by the services for logging
 echo "----------- Connecting to the RDS instance to create tables -----------"
 mysql -h $(terraform output -raw rds_address) -P $(terraform output -raw rds_port) -u $(terraform output -raw db_username) -p$(terraform output -raw db_password) -e "CREATE DATABASE yolov5_predictions;CREATE TABLE yolov5_predictions.requests (Address varchar(255),ImageName varchar(255),JsonPredictions varchar(5000));"
-
+echo "Done."
 # You can connect to the EC2 instances with:
 # ssh ubuntu@ec2-[public_ip].compute-1.amazonaws.com
