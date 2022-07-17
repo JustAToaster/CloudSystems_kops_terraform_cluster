@@ -20,7 +20,3 @@ You can connect to the EC2 instances with:
 `ssh ubuntu@ec2-[public_ip].compute-1.amazonaws.com`
 
 Services can then be loaded to the k8s cluster with **start_services.sh**.
-
-## TODO
-- Implement actual services (like ML demos)
-- Use GitHub actions to update them when needed
