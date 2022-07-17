@@ -1,16 +1,32 @@
-kind: Pod
-apiVersion: v1
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: banana-app
-  labels:
-    app: banana
+  name: banana-app-deployment
 spec:
-  containers:
-    - name: banana-app
-      image: hashicorp/http-echo
-      args:
-        - "-text=banana"
-
+  replicas: 1
+  selector:
+    matchLabels:
+      app: banana-app
+  template:
+    metadata:
+      labels:
+        app: banana-app
+    spec:      
+      containers:
+      - image: hashicorp/http-echo
+        args:
+          - "-text=banana"
+          - "-listen=:32333"
+        name: banana-app
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 32333
+          hostPort: 32333
+        resources:
+          limits:
+            ephemeral-storage: 512Mi
+          requests:
+            ephemeral-storage: 512Mi
 ---
 kind: Service
 apiVersion: v1
@@ -18,31 +34,30 @@ metadata:
   name: banana-service
 spec:
   selector:
-    app: banana
+    app: banana-app
   type: NodePort
   ports:
-    - port: 5678 # Default port for image
+    - port: 32333
       nodePort: 32333
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: banana-ingress
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: banana-ingress
 spec:
   rules:
-    - http:
-        paths:
-          - path: /banana
-            pathType: Prefix
-            backend:
-              service:
-                name: banana-service
-                port:
-                  number: 5678
+  - http:
+      paths:
+      - backend:
+          service:
+            name: banana-service
+            port:
+              number: 32333
+        path: /banana
+        pathType: Prefix

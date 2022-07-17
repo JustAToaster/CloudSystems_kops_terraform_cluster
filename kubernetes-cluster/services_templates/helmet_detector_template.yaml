@@ -1,25 +1,36 @@
-kind: Pod
-apiVersion: v1
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: helmet-app
-  labels:
-    app: helmet
+  name: helmet-app-deployment
 spec:
-  containers:
-    - name: helmet-app
-      image: justatoaster64/yolov5-helmet-detector
-      env:
-      - name: DB_HOSTNAME
-        value: {{$.rds_address.value}}
-      - name: DB_USERNAME
-        value: {{$.db_username.value}}
-      - name: DB_PASSWORD
-        value: {{$.db_password.value}}
-      resources:
-        requests:
-          ephemeral-storage: "2Gi"
-        limits:
-          ephemeral-storage: "2Gi"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helmet-app
+  template:
+    metadata:
+      labels:
+        app: helmet-app
+    spec:      
+      containers:
+      - env:
+        - name: DB_HOSTNAME
+          value: {{$.rds_address.value}}
+        - name: DB_USERNAME
+          value: {{$.db_username.value}}
+        - name: DB_PASSWORD
+          value: {{$.db_password.value}}
+        image: justatoaster64/yolov5-helmet-detector:latest
+        name: helmet-app
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 32332
+            hostPort: 32332
+        resources:
+          limits:
+            ephemeral-storage: 512Mi
+          requests:
+            ephemeral-storage: 512Mi
 ---
 
 kind: Service
@@ -28,7 +39,7 @@ metadata:
   name: helmet-service
 spec:
   selector:
-    app: helmet
+    app: helmet-app
   type: NodePort
   ports:
     - port: 32332
