@@ -48,12 +48,15 @@ echo "----------- 9. Updating cluster -----------"
 #export KOPS_RUN_TOO_NEW_VERSION=1
 kops update cluster --name $CLUSTER_NAME --state $KOPS_STATE_STORE --yes
 kops export kubecfg --name $CLUSTER_NAME --state $KOPS_STATE_STORE --admin=8670h0m0s
+# Attach EC2FullAccess to avoid authorization issues inside the instances
+aws iam attach-role-policy --role-name nodes.$CLUSTER_NAME --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
+aws iam attach-role-policy --role-name masters.$CLUSTER_NAME --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
 echo "Done."
 
-echo "----------- 10. Rolling update cluster -----------"
+#echo "----------- 10. Rolling update cluster -----------"
 # Rolling update often needed to make sure all nodes join the cluster and the configuration is updated
 # It is really wonky, sometimes it just does not work and I have to restart it multiple times.
-kops rolling-update cluster --cloudonly --name $CLUSTER_NAME --state $KOPS_STATE_STORE --force --yes
+#kops rolling-update cluster --cloudonly --name $CLUSTER_NAME --state $KOPS_STATE_STORE --force --yes
 # Validation does not end because some default stuff is not installed. It should be an issue with t2.micro instances.
 # kops validate cluster --state $KOPS_STATE_STORE --wait 10m
 
