@@ -20,3 +20,7 @@ If you wish to connect to RDS instance and use MySQL, use the following command 
 You can connect to the EC2 instances with:
 
 `ssh ubuntu@ec2-[public_ip].compute-1.amazonaws.com`
+
+## Service
+
+The service used is a YOLOv5 helmet detection service built with Flask and can be found in [this repository](https://github.com/JustAToaster/helmet_detection_webservice).
