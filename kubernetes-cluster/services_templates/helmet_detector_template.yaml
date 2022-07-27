@@ -32,38 +32,20 @@ spec:
           requests:
             ephemeral-storage: 512Mi
 ---
-
 kind: Service
 apiVersion: v1
+
 metadata:
-  name: helmet-service
+  name: helmet-elb
+  namespace: default
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+
 spec:
+  type: LoadBalancer
   selector:
     app: helmet-app
-  type: NodePort
   ports:
-    - port: 32332
-      nodePort: 32332
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: helmet-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    kubernetes.io/ingress.class: "nginx"
-spec:
-  rules:
-  - http:
-        paths:
-          - path: /helmet
-            pathType: Prefix
-            backend:
-              service:
-                name: helmet-service
-                port: 
-                  number: 32332
+    - name: http
+      port: 32332
+      targetPort: 32332

@@ -30,34 +30,18 @@ spec:
 ---
 kind: Service
 apiVersion: v1
+
 metadata:
-  name: banana-service
+  name: banana-elb
+  namespace: default
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+
 spec:
+  type: LoadBalancer
   selector:
     app: banana-app
-  type: NodePort
   ports:
-    - port: 32333
-      nodePort: 32333
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: banana-ingress
-spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          service:
-            name: banana-service
-            port:
-              number: 32333
-        path: /banana
-        pathType: Prefix
+    - name: http
+      port: 32333
+      targetPort: 32333
