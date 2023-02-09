@@ -1,5 +1,5 @@
 # CloudSystems_kops_terraform_cluster
-Cloud Systems project 2021/22.
+Cloud Systems project 2021/22 and later improved upon for my Computer Science Master's Thesis.
 
 ## Introduction
 This project uses Terraform to define a Kubernetes cluster on AWS associated with an RDS instance.
@@ -13,9 +13,9 @@ You will be prompted multiple times to assign values to the DB username and pass
 
 Once all nodes are ready, services can be loaded to the k8s cluster with **start_services.sh**. This will also update the CoreDNS ClusterRole by adding **nodes** as resources, in order to fix internet access from the Pods.
 
-If you wish to connect to the RDS instance and use MySQL, use the following command in the terraform folder (with the proper username), then put the password when asked.
+If you wish to connect to the RDS instance and use PostgreSQL, use the following command in the terraform folder (with the proper username), then put the password when asked.
 
-`mysql -h $(terraform output -raw rds_address) -P $(terraform output -raw rds_port) -u username -p`
+`PGPASSWORD=$(terraform output -raw db_password) psql -h $(terraform output -raw rds_address) -P $(terraform output -raw rds_port) -U $(terraform output -raw db_username)"`
 
 You can connect to the EC2 instances with:
 
@@ -23,4 +23,5 @@ You can connect to the EC2 instances with:
 
 ## Service
 
-The service used is a YOLOv5 helmet detection service built with Flask and can be found in [this repository](https://github.com/JustAToaster/helmet_detection_webservice).
+The service used is a YOLOv5 detection and labeling service built with Flask and can be found in [this repository](https://github.com/JustAToaster/labeling_and_detection_webservice).
+A simpler service for just object detection can be found [here](https://github.com/JustAToaster/helmet_detection_webservice).
