@@ -36,16 +36,15 @@ resource "aws_security_group" "security_group_rds" {
 
 resource "aws_db_parameter_group" "pg" {
   name   = "rds-pg"
-  family = "mysql5.7"
+  family = "aurora-postgresql13"
 
   parameter {
-    name  = "character_set_server"
-    value = "utf8"
+    name  = "log_connections"
+    value = "1"
   }
 
-  parameter {
-    name  = "character_set_client"
-    value = "utf8"
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -53,8 +52,8 @@ resource "aws_db_instance" "projdb" {
   identifier             = "projdb"
   instance_class         = local.instance_class
   allocated_storage      = local.allocated_storage
-  engine                 = "mysql"
-  engine_version         = "5.7"
+  engine                 = "aurora-postgresql"
+  engine_version         = "13.6"
   username               = local.db_username
   password               = local.db_password
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
