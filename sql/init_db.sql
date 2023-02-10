@@ -1,6 +1,6 @@
 CREATE DATABASE yolov5_predictions;
-CREATE TABLE yolov5_predictions.requests (UserAddress varchar(255),ImageName varchar(255), CustomizationScore float);
-CREATE TABLE yolov5_predictions.users (UserAddress varchar(255), NumAccesses integer, TotalScore float);
+CREATE TABLE yolov5_predictions.requests (RequestId SERIAL PRIMARY KEY, UserAddress varchar(255),ImageName varchar(255), CustomizationScore float);
+CREATE TABLE yolov5_predictions.users (UserAddress varchar(255) PRIMARY KEY, NumAccesses integer, SuspiciousRequests integer, TotalScore float);
 
 CREATE EXTENSION IF NOT EXISTS aws_lambda CASCADE;
 
@@ -10,10 +10,9 @@ CREATE OR REPLACE FUNCTION check_user()
   AS
 $$
 DECLARE
-    MaxAccesses constant integer := 20;
-    ScoreThreshold constant float := 0.8;
+    MaxSuspiciousRequests constant integer := 20;
 BEGIN
-    IF (NEW.NumAccesses > MaxAccesses AND (cast(NEW.TotalScore as float)/NEW.NumAccesses) > ScoreThreshold) THEN
+    IF (NEW.SuspiciousRequests > MaxSuspiciousRequests) THEN
         IF cardinality(TG_ARGV)!=2 THEN
         RAISE EXCEPTION 'Expected 2 parameters but got %', cardinality(TG_ARGV);
     ELSEIF TG_ARGV[0]='' THEN
@@ -37,8 +36,15 @@ CREATE OR REPLACE FUNCTION log_user_activity()
   LANGUAGE PLPGSQL
   AS
 $$
+DECLARE
+    ScoreThreshold constant float := 0.4;
 BEGIN
+    INSERT INTO yolov5_predictions.users (UserAddress, NumAccesses, SuspiciousRequests, TotalScore) values (
+    NEW.UserAddress, 0, 0, 0.0) on conflict (UserAddress) do nothing;
     UPDATE yolov5_predictions.users SET (NumAccesses, TotalScore) = (NumAccesses+1, TotalScore+NEW.CustomizationScore) WHERE UserAddress = NEW.UserAddress;
+    IF (NEW.CustomizationScore > ScoreThreshold) THEN
+        UPDATE yolov5_predictions.users SET (SuspiciousRequests) = (SuspiciousRequests+1) WHERE UserAddress = NEW.UserAddress;
+    END IF;
 END
 $$;
 
@@ -48,6 +54,6 @@ CREATE TRIGGER trigger_requests_insert
   EXECUTE PROCEDURE log_user_activity();
 
 CREATE TRIGGER trigger_users_update
-  AFTER UPDATE ON yolov5_predictions.users
+  AFTER UPDATE OF SuspiciousRequests ON yolov5_predictions.users
   FOR EACH ROW
   EXECUTE PROCEDURE check_user("update_reported_list", "us-east-1");
