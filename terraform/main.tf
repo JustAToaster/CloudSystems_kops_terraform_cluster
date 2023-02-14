@@ -17,6 +17,8 @@ locals {
   master_az                    = "us-east-1a"
   environment            = "dev-kops-proj"
   kops_state_bucket_name = "kops-config-s3"
+  models_data_bucket_name = "justatoaster-yolov5-models"
+  training_data_bucket_name = "justatoaster-yolov5-training-data"
 
   kubernetes_cluster_name = "terraform-kops-proj.k8s.local"
   ingress_ips             = ["10.0.0.100/32", "10.0.0.101/32"]
