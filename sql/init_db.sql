@@ -1,5 +1,5 @@
 CREATE DATABASE yolov5_predictions;
-CREATE TABLE yolov5_predictions.requests (RequestId SERIAL PRIMARY KEY, UserAddress varchar(255),ImageName varchar(255), CustomizationScore float);
+CREATE TABLE yolov5_predictions.requests (RequestId SERIAL PRIMARY KEY, UserAddress varchar(255), ModelName varchar(255), ImageName varchar(255), CustomizationScore float);
 CREATE TABLE yolov5_predictions.users (UserAddress varchar(255) PRIMARY KEY, NumAccesses integer, SuspiciousRequests integer, TotalScore float);
 
 CREATE EXTENSION IF NOT EXISTS aws_lambda CASCADE;
@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION check_user()
   AS
 $$
 DECLARE
-    MaxSuspiciousRequests constant integer := 20;
+    MaxSuspiciousRequests constant integer := 10;
 BEGIN
     IF (NEW.SuspiciousRequests > MaxSuspiciousRequests) THEN
         IF cardinality(TG_ARGV)!=2 THEN
@@ -37,10 +37,10 @@ CREATE OR REPLACE FUNCTION log_user_activity()
   AS
 $$
 DECLARE
-    ScoreThreshold constant float := 0.4;
+    ScoreThreshold constant float := 0.7;
 BEGIN
-    INSERT INTO yolov5_predictions.users (UserAddress, NumAccesses, SuspiciousRequests, TotalScore) values (
-    NEW.UserAddress, 0, 0, 0.0) on conflict (UserAddress) do nothing;
+    INSERT INTO yolov5_predictions.users (UserAddress, NumAccesses, SuspiciousRequests, TotalScore) VALUES (
+    NEW.UserAddress, 0, 0, 0.0) ON CONFLICT (UserAddress) DO NOTHING;
     UPDATE yolov5_predictions.users SET (NumAccesses, TotalScore) = (NumAccesses+1, TotalScore+NEW.CustomizationScore) WHERE UserAddress = NEW.UserAddress;
     IF (NEW.CustomizationScore > ScoreThreshold) THEN
         UPDATE yolov5_predictions.users SET (SuspiciousRequests) = (SuspiciousRequests+1) WHERE UserAddress = NEW.UserAddress;

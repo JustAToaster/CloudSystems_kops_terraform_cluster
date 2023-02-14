@@ -34,6 +34,7 @@ echo $KOPS_STATE_STORE
 echo "----------- 6. Generating cluster.yaml and service YAMLs from templates and terraform values -----------"
 kops toolbox template --name $CLUSTER_NAME --state $KOPS_STATE_STORE --values values.json --template ../kubernetes-cluster/cluster-template.yaml --format-yaml > cluster.yaml
 kops toolbox template --name $CLUSTER_NAME --state $KOPS_STATE_STORE --values values.json --template ../kubernetes-cluster/services_templates/helmet_detector_template.yaml --format-yaml > ../kubernetes-cluster/services/helmet_detector.yaml
+kops toolbox template --name $CLUSTER_NAME --state $KOPS_STATE_STORE --values values.json --template ../kubernetes-cluster/services_templates/labeling_detection_template.yaml --format-yaml > ../kubernetes-cluster/services/helmet_detector.yaml
 echo "Done."
 
 echo "----------- 7. Creating cluster with cluster.yaml configuration -----------"
@@ -65,7 +66,7 @@ echo "The cluster will be ready in a few minutes. Hopefully..."
 echo "If some nodes do not show up after 10 minutes, do a rolling update with ./rolling_update_cluster.sh"
 
 # Create the tables used by the services for logging
-echo "----------- Connecting to the RDS instance to create tables -----------"
+echo "----------- Connecting to the RDS instance to create tables and triggers -----------"
 PGPASSWORD=$(terraform output -raw db_password) psql -h $(terraform output -raw rds_address) -P $(terraform output -raw rds_port) -U $(terraform output -raw db_username) -f "../sql/init_db.sql"
 echo "Done."
 # You can connect to the EC2 instances with:

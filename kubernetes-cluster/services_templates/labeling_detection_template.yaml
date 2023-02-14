@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: labeling-detection-app-deployment
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: labeling-detection-app
+  template:
+    metadata:
+      labels:
+        app: labeling-detection-app
+    spec:      
+      containers:
+      - env:
+        - name: DB_HOSTNAME
+          value: {{$.rds_address.value}}
+        - name: DB_USERNAME
+          value: {{$.db_username.value}}
+        - name: DB_PASSWORD
+          value: {{$.db_password.value}}
+        - name: AWS_DEFAULT_REGION
+          value: {{$.region.value}}
+        image: justatoaster64/yolov5-labeling-detection-webservice:latest
+        name: labeling-detection-app
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 32332
+            hostPort: 32332
+        resources:
+          limits:
+            ephemeral-storage: 512Mi
+          requests:
+            ephemeral-storage: 512Mi
+---
+kind: Service
+apiVersion: v1
+
+metadata:
+  name: labeling-detection-elb
+  namespace: default
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: labeling-detection-app
+  ports:
+    - name: http
+      port: 32332
+      targetPort: 32332

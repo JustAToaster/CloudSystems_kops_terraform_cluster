@@ -1,9 +1,8 @@
-# Built-ins
 from os import getenv
 from json import dumps
 from typing import Any, Dict
 from http import HTTPStatus
-# Third party
+
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities.parser import event_parser, BaseModel
 import boto3
@@ -18,8 +17,9 @@ def handler(event: UserInsertionEvent, context: LambdaContext) -> Dict[str, Any]
     report_file_name = 'report_list.txt'
     bucket_name = ""
     s3_client.download_file(bucket_name, report_file_name, report_file_name)
-    with open(report_file_name, 'w') as report_file:
-                report_file.write(event.UserAddress + "\n")
+    # Open in append mode
+    with open(report_file_name, 'a') as report_file:
+                report_file.write(event.UserAddress + "\t" + event.reported_at + "\n")
     response = s3_client.upload_file(report_file_name, bucket_name, report_file_name)
     return {
         "lambda_request_id": context.aws_request_id,
