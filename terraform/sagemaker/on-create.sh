@@ -22,8 +22,15 @@ conda activate "$KERNEL_NAME"
 pip install --quiet ipykernel
 
 # Cloning yolov5 repository
-git clone https://github.com/JustAToaster/yolov5
+git clone https://github.com/ultralytics/yolov5
 cd yolov5
 # Installing yolov5 dependencies
 pip install --qr requirements.txt
+
+echo "Fetching the training jobs script"
+wget https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/training_jobs.py
+
+echo "Fetching the custom YOLOv5 validation script"
+wget -c https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/val.py
+
 EOF

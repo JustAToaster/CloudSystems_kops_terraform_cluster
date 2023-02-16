@@ -37,10 +37,10 @@ def get_current_dataset_size_yaml(model_name, is_pending=False):
     size_found = 0
     with open(yaml_path, 'r') as yaml_file:
         for line in yaml_file:
-            if 'training_set_size:' in line:
+            if line.startswith('training_set_size:'):
                 current_training_set_size = int(line.rsplit(':')[1].strip())
                 size_found = size_found + 1
-            if 'validation_set_size:' in line:
+            elif line.startswith('validation_set_size:'):
                 current_validation_set_size = int(line.rsplit(':')[1].strip())
                 size_found = size_found + 1
             if size_found == 2:

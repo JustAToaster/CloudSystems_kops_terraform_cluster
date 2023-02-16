@@ -3,7 +3,6 @@
 set -e -o pipefail
 
 sudo -u ec2-user -i << 'EOF'
-
 unset SUDO_UID
 # Setting the source for the custom conda kernel
 WORKING_DIR=/home/ec2-user/SageMaker/custom-miniconda
