@@ -1,4 +1,4 @@
-from os import getenv
+import os
 from json import dumps
 from typing import Any, Dict
 from http import HTTPStatus
@@ -15,7 +15,7 @@ class UserInsertionEvent(BaseModel):
 def handler(event: UserInsertionEvent, context: LambdaContext) -> Dict[str, Any]:
     s3_client = boto3.client("s3")
     report_file_name = 'report_list.txt'
-    bucket_name = ""
+    bucket_name = os.environ['models_bucket']
     s3_client.download_file(bucket_name, report_file_name, report_file_name)
     # Open in append mode
     with open(report_file_name, 'a') as report_file:

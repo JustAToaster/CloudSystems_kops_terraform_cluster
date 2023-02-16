@@ -79,6 +79,7 @@ resource "aws_iam_policy" "invoke_lambda_policy" {
     ]
   })
 }
+
 resource "aws_iam_role" "rds_lambda_role" {
   name               = "rds_lambda_role"
   assume_role_policy = jsonencode({
@@ -94,6 +95,7 @@ resource "aws_iam_role" "rds_lambda_role" {
     ]
   })
 }
+
 resource "aws_iam_role_policy_attachment" "rds_lambda_role_attach" {
   role       = aws_iam_role.rds_lambda_role.name
   policy_arn = aws_iam_policy.invoke_lambda_policy.arn
