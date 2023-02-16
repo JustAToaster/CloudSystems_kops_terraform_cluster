@@ -17,4 +17,4 @@ jobs:
     - run: chmod 600 ec2_dev_private_key
     
     - name: Run rolling update on remote environment
-      run: ssh -i ec2_dev_private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_DEV_HOST_NAME }} kubectl rollout restart deployment helmet-app-deployment
+      run: ssh -i ec2_dev_private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_DEV_HOST_NAME }} kubectl rollout restart deployment labeling-detection-app-deployment
