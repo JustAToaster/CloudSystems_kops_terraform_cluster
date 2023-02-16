@@ -27,6 +27,6 @@ The service used is a YOLOv5 detection and labeling service built with Flask and
 A simpler service for just object detection can be found [here](https://github.com/JustAToaster/helmet_detection_webservice).
 
 ## TODO
-- Lambda functions for both user reporting and initiating training tasks on SageMaker.
+- Lambda function for initiating training tasks on SageMaker.
 - SageMaker training and uploading to S3.
-- Launch lambdas and the SageMaker instance with Terraform
+- Provision lambda and the SageMaker instance with Terraform
