@@ -20,6 +20,8 @@ resource "aws_iam_policy_attachment" "sm_full_access_attach" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
 }
 
+//Git repositories are checked out after lifecycle scripts: we will just clone the repository inside the script
+/*
 resource "aws_sagemaker_code_repository" "git_repo" {
   code_repository_name = "yolov5"
   
@@ -27,6 +29,7 @@ resource "aws_sagemaker_code_repository" "git_repo" {
     repository_url = "https://github.com/justatoaster/yolov5.git"
   }
 }
+*/
 
 resource "aws_sagemaker_notebook_instance_lifecycle_configuration" "notebook_config" {
   name = "sm-lifecycle-config"
@@ -39,5 +42,12 @@ resource "aws_sagemaker_notebook_instance" "training_notebook_instance" {
   role_arn = aws_iam_role.notebook_iam_role.arn
   instance_type = "ml.t3.medium"
   lifecycle_config_name = aws_sagemaker_notebook_instance_lifecycle_configuration.notebook_config.name
-  default_code_repository = aws_sagemaker_code_repository.git_repo.code_repository_name
+  //default_code_repository = aws_sagemaker_code_repository.git_repo.code_repository_name
+  //Can't insert environment variables, so we have to use the tag to pass the bucket name
+  tags = {
+    models_bucket = local.models_data_bucket_name
+    num_training_epochs = locals.num_training_epochs
+    num_finetuning_epochs = locals.num_finetuning_epochs
+    batch_size = locals.batch_size
+  }
 }
