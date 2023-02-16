@@ -80,6 +80,20 @@ def get_pending_models_to_train(s3_client, pending_models_list, bucket_name):
             pending_models_to_train.append(curr_pending_model)
     return pending_models_to_train
 
+def write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train):
+    pending_models_filename = 'pending_models_job.txt'
+    with open(pending_models_filename, 'w') as pending_models_file:
+        for pending_model in pending_models_to_train:
+            pending_models_file.write(pending_model + "\n")
+
+    models_filename = 'models_job.txt'
+    with open(models_filename, 'w') as models_file:
+        for model in models_to_train:
+            models_file.write(model + "\n")
+    
+    s3_client.upload_file(pending_models_filename, bucket_name, pending_models_filename)
+    s3_client.upload_file(models_filename, bucket_name, models_filename)
+
 def handler(event, context):
     s3_client = boto3.client("s3")
     s3_resource = boto3.resource("s3")
@@ -88,9 +102,16 @@ def handler(event, context):
     pending_models_list, models_list = get_models_list(s3_client, s3_resource, bucket_name)
     download_yamls_from_s3(s3_client, models_list, 'pending_models/', bucket_name)
     download_yamls_from_s3(s3_client, models_list, 'models/', bucket_name)
-    models_to_train = get_models_to_train(s3_client, models_list, bucket_name)
     pending_models_to_train = get_pending_models_to_train(s3_client, pending_models_list, bucket_name)
+    models_to_train = get_models_to_train(s3_client, models_list, bucket_name)
+
+    # Communicate to the SageMaker instance through training job files on S3 (avoid setting up a server or recomputing the models to train)
+    write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train)
     
+    sagemaker_client = boto3.client("sagemaker")
+
+    response = sagemaker_client.start_notebook_instance(NotebookInstanceName=os.environ['sagemaker_instance_name'])
+
     return {
         "lambda_request_id": context.aws_request_id,
         "lambda_arn": context.invoked_function_arn,

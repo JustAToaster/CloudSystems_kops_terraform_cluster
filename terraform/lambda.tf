@@ -58,6 +58,12 @@ resource "aws_iam_role" "iam_for_training_lambda" {
   })
 }
 
+# Give full SageMaker access to the training schedule lambda function
+resource "aws_iam_role_policy_attachment" "rds_lambda_role_attach" {
+  role       = aws_iam_role.iam_for_training_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+}
+
 resource "aws_lambda_function" "training_check_schedule_lambda_function" {
   function_name = "training_check_schedule"
   filename         = data.archive_file.training_check_schedule_lambda_function_archive.output_path
@@ -73,6 +79,8 @@ resource "aws_lambda_function" "training_check_schedule_lambda_function" {
 
       min_training_data = local.min_training_data
       min_validation_data = local.min_validation_data
+
+      sagemaker_instance_name = aws_sagemaker_notebook_instance.training_notebook_instance.name
     }
   }
 }
