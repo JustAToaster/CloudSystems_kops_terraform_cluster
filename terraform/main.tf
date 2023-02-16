@@ -18,7 +18,15 @@ locals {
   environment            = "dev-kops-proj"
   kops_state_bucket_name = "kops-config-s3"
   models_data_bucket_name = "justatoaster-yolov5-models"
-  training_data_bucket_name = "justatoaster-yolov5-training-data"
+  training_check_frequency_minutes = 30 //Frequency of training lambda function call
+
+  # Minimum number of new records for which a model is scheduled for training in the lambda function
+  min_new_training_data = 20
+  min_new_validation_data = 4
+
+  # Minimum number of records for which a pending model is scheduled for training in the lambda function
+  min_training_data = 80
+  min_validation_data = 20
 
   kubernetes_cluster_name = "terraform-kops-proj.k8s.local"
   ingress_ips             = ["10.0.0.100/32", "10.0.0.101/32"]
