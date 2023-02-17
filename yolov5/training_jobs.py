@@ -83,9 +83,9 @@ if __name__ == "__main__":
         if tag['Key'] == 'batch_size':
             batch_size = int(tag['Value'])
         if tag['Key'] == 'log_group_name':
-            log_group_name = int(tag['Value'])
+            log_group_name = tag['Value']
         if tag['Key'] == 'log_stream_name':
-            log_stream_name = int(tag['Value'])
+            log_stream_name = tag['Value']
 
     log_message("Starting training job...")
 

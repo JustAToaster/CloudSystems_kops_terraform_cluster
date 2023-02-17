@@ -19,10 +19,10 @@ pip install boto3
 conda deactivate
 
 echo "Fetching the training jobs script"
-wget https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/training_jobs.py
+curl -O https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/training_jobs.py
 
 echo "Fetching the custom YOLOv5 validation script"
-wget -c https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/val.py
+curl -O https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/val.py
 
 # echo "Stopping the notebook instance"
 # NOTEBOOK_INSTANCE_NAME=$(jq '.ResourceName' /opt/ml/metadata/resource-metadata.json --raw-output)
