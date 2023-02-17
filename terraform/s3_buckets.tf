@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "kops_state" {
   tags          = "${merge(local.tags)}"
 }
 
-resource "aws_s3_bucket_acl" "s3_bucket_acl" {
+resource "aws_s3_bucket_acl" "s3_kops_state_bucket_acl" {
   bucket = aws_s3_bucket.kops_state.bucket
   acl    = "public-read-write"
 }
@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "models_data" {
   tags          = "${merge(local.tags)}"
 }
 
-resource "aws_s3_bucket_acl" "s3_bucket_acl" {
+resource "aws_s3_bucket_acl" "s3_models_data_bucket_acl" {
   bucket = aws_s3_bucket.models_data.bucket
   acl    = "public-read-write"
 }
