@@ -35,6 +35,6 @@ wget -c https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terrafo
 
 echo "Stopping the notebook instance"
 NOTEBOOK_INSTANCE_NAME=$(jq '.ResourceName' /opt/ml/metadata/resource-metadata.json --raw-output)
-aws sagemaker stop-notebook-instance --notebook-instance-name $SAGEMAKER_INSTANCE_NAME
+aws sagemaker stop-notebook-instance --notebook-instance-name $NOTEBOOK_INSTANCE_NAME
 
 EOF
