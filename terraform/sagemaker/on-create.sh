@@ -33,4 +33,8 @@ wget https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_
 echo "Fetching the custom YOLOv5 validation script"
 wget -c https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/val.py
 
+echo "Stopping the notebook instance"
+NOTEBOOK_INSTANCE_NAME=$(jq '.ResourceName' /opt/ml/metadata/resource-metadata.json --raw-output)
+aws sagemaker stop-notebook-instance --notebook-instance-name $SAGEMAKER_INSTANCE_NAME
+
 EOF
