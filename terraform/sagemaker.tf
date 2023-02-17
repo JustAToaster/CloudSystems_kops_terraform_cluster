@@ -43,7 +43,7 @@ resource "aws_sagemaker_notebook_instance_lifecycle_configuration" "notebook_con
 }
 
 resource "aws_sagemaker_notebook_instance" "training_notebook_instance" {
-  name = "sagemaker_training_notebook"
+  name = "sagemaker-training-notebook"
   role_arn = aws_iam_role.notebook_iam_role.arn
   instance_type = "ml.t3.medium"
   lifecycle_config_name = aws_sagemaker_notebook_instance_lifecycle_configuration.notebook_config.name
