@@ -1,4 +1,4 @@
-CREATE DATABASE yolov5_predictions;
+CREATE SCHEMA yolov5_predictions;
 CREATE TABLE yolov5_predictions.requests (RequestId SERIAL PRIMARY KEY, UserAddress varchar(255), ModelName varchar(255), ImageName varchar(255), CustomizationScore float);
 CREATE TABLE yolov5_predictions.users (UserAddress varchar(255) PRIMARY KEY, NumAccesses integer, SuspiciousRequests integer, TotalScore float);
 

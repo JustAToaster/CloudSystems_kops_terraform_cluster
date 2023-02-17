@@ -89,8 +89,8 @@ if __name__ == "__main__":
 
     log_message("Starting training job...")
 
-    s3_client.download_file('pending_models_job.txt', bucket_name, 'pending_models_job.txt')
-    s3_client.download_file('models_job.txt', bucket_name, 'models_job.txt')
+    s3_client.download_file(bucket_name, 'pending_models_job.txt', 'pending_models_job.txt')
+    s3_client.download_file(bucket_name, 'models_job.txt', 'models_job.txt')
     pending_models_to_train = []
     models_to_train = []
     with open('pending_models_job.txt', 'r') as file:
