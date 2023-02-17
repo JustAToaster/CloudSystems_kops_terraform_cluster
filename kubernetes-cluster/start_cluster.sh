@@ -2,7 +2,7 @@
 
 set -e -o pipefail
 
-echo "----------- 0. Attach all necessary permissions to kops group -----------"
+echo "----------- 1. Attach all necessary permissions to kops group -----------"
 aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess --group-name kops
 aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonRoute53FullAccess --group-name kops
 aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --group-name kops
@@ -12,10 +12,10 @@ aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonSQSFullAc
 aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess --group-name kops
 aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonSageMakerFullAccess --group-name kops
 
-echo "----------- 1. Executing terraform init -----------"
+echo "----------- 2. Executing terraform init -----------"
 cd ../terraform && terraform init
 
-echo "----------- 2. Executing terraform plan -----------"
+echo "----------- 3. Executing terraform plan -----------"
 terraform plan
 
 read -p "Press y/Y to create the cluster with this configuration. " -n 1 -r
@@ -27,25 +27,19 @@ fi
 echo
 echo "Cluster creation starting."
 
-echo "----------- 3. Executing terraform apply -----------"
+echo "----------- 4. Executing terraform apply -----------"
 terraform apply
 
-echo "----------- 4. Getting terraform output as json -----------"
+echo "----------- 5. Getting terraform output as json -----------"
 terraform output -json > values.json
 echo "Done."
 # yq eval -P values.json > values.yaml
 
-echo "----------- 5. Get kubernetes_cluster_name and kops_s3_bucket values with jq -----------"
+echo "----------- 6. Get kubernetes_cluster_name and kops_s3_bucket values with jq -----------"
 export CLUSTER_NAME="$(jq -r .kubernetes_cluster_name.value values.json)"
 export KOPS_STATE_STORE="s3://$(jq -r .kops_s3_bucket.value values.json)"
-export SAGEMAKER_INSTANCE_NAME="$(jq -r .sagemaker_instance_name.value values.json)"
 echo $CLUSTER_NAME
 echo $KOPS_STATE_STORE
-echo $SAGEMAKER_INSTANCE_NAME
-
-echo "----------- 6. Stopping SageMaker notebook instance (will start only on demand) -----------"
-aws sagemaker stop-notebook-instance --notebook-instance-name $SAGEMAKER_INSTANCE_NAME
-echo "Done."
 
 echo "----------- 7. Generating cluster.yaml and service YAMLs from templates and terraform values -----------"
 kops toolbox template --name $CLUSTER_NAME --state $KOPS_STATE_STORE --values values.json --template ../kubernetes-cluster/cluster-template.yaml --format-yaml > cluster.yaml
