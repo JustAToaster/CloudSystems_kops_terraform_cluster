@@ -2,6 +2,16 @@
 
 set -e -o pipefail
 
+echo "----------- 0. Attach all necessary permissions to kops group -----------"
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess --group-name kops
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonRoute53FullAccess --group-name kops
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --group-name kops
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/IAMFullAccess --group-name kops
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonVPCFullAccess --group-name kops
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonSQSFullAccess --group-name kops
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess --group-name kops
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonSageMakerFullAccess --group-name kops
+
 echo "----------- 1. Executing terraform init -----------"
 cd ../terraform && terraform init
 
@@ -34,8 +44,6 @@ echo $KOPS_STATE_STORE
 echo $SAGEMAKER_INSTANCE_NAME
 
 echo "----------- 6. Stopping SageMaker notebook instance (will start only on demand) -----------"
-# Attach SageMakerFullAccess to kops group if not there (it's not present in the kops instructions)
-aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonSageMakerFullAccess --group-name kops
 aws sagemaker stop-notebook-instance --notebook-instance-name $SAGEMAKER_INSTANCE_NAME
 echo "Done."
 
