@@ -103,6 +103,6 @@ resource "aws_iam_role_policy_attachment" "rds_lambda_role_policy" {
 
 resource "aws_db_instance_role_association" "rds_lambda_role_attach" {
   db_instance_identifier = aws_db_instance.projdb.id
-  feature_name           = "LAMBDA"
+  feature_name           = "Lambda"
   role_arn               = aws_iam_role.rds_lambda_role.arn
 }
