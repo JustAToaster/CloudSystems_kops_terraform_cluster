@@ -95,9 +95,9 @@ if __name__ == "__main__":
         # Remove model from pending models in S3
         move_pending_model(bucket_name, pending_model)
         # Upload new yaml
-        s3_client.upload_file('pending_models/{pending_model}/{pending_model}.yaml'.format(pending_model=pending_model), bucket_name, 'models/{pending_model}/{pending_model}.yaml'.format(pending_model=pending_model))
+        s3_client.upload_file('pending_models/{model}/{model}.yaml'.format(model=pending_model), bucket_name, 'models/{model}/{model}.yaml'.format(model=pending_model))
         # Upload actual model with weights
-        s3_client.upload_file('pending_models/' + pending_model + '/weights/last.pt', bucket_name, 'models/{pending_model}/{pending_model}.pt'.format(pending_model=pending_model))
+        s3_client.upload_file('pending_models/' + pending_model + '/weights/last.pt', bucket_name, 'models/{model}/{model}.pt'.format(model=pending_model))
 
     for model in models_to_train:
         download_model_data(bucket_name, pending_model, is_pending=False)

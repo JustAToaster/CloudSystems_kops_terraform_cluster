@@ -1,5 +1,4 @@
 import os
-import operator
 from http import HTTPStatus
 
 import boto3
@@ -38,10 +37,10 @@ def get_current_dataset_size_yaml(model_name, is_pending=False):
     with open(yaml_path, 'r') as yaml_file:
         for line in yaml_file:
             if line.startswith('training_set_size:'):
-                current_training_set_size = int(line.rsplit(':')[1].strip())
+                current_training_set_size = int(line.replace('training_set_size:', '').strip())
                 size_found = size_found + 1
             elif line.startswith('validation_set_size:'):
-                current_validation_set_size = int(line.rsplit(':')[1].strip())
+                current_validation_set_size = int(line.replace('validation_set_size:', '').strip())
                 size_found = size_found + 1
             if size_found == 2:
                 break
@@ -63,7 +62,7 @@ def get_models_to_train(s3_client, models_list, bucket_name):
 
     for curr_model in models_list:
         current_training_set_size, current_validation_set_size = get_current_dataset_size_yaml(curr_model, is_pending=False)
-        updated_training_set_size, updated_validation_set_size = count_updated_dataset_size(s3_client, bucket_name, '/models/' + curr_model)
+        updated_training_set_size, updated_validation_set_size = count_updated_dataset_size(s3_client, bucket_name, 'models/' + curr_model)
         if updated_training_set_size-current_training_set_size >= min_new_training_data and updated_validation_set_size-current_validation_set_size >= min_new_validation_data:
             models_to_train.append(curr_model)
     return models_to_train
@@ -75,7 +74,7 @@ def get_pending_models_to_train(s3_client, pending_models_list, bucket_name):
     min_validation_data = int(os.environ['min_validation_data'])
 
     for curr_pending_model in pending_models_list:
-        training_set_size, validation_set_size = count_updated_dataset_size(s3_client, bucket_name, '/pending_models/' + curr_pending_model)
+        training_set_size, validation_set_size = count_updated_dataset_size(s3_client, bucket_name, 'pending_models/' + curr_pending_model)
         if training_set_size >= min_training_data and validation_set_size >= min_validation_data:
             pending_models_to_train.append(curr_pending_model)
     return pending_models_to_train

@@ -2,7 +2,7 @@
 locals {
   num_masters = 1
   //Number of nodes per AZ
-  num_nodes = 3
+  num_nodes = 1
 }
 
 //Master(s) configuration
@@ -23,6 +23,6 @@ locals {
   nodes_machine_type = "t2.micro"
   nodes_volume_size = 12
   //Max and min size for autoscaling group
-  nodes_max_size = 1
+  nodes_max_size = 2
   nodes_min_size = 1
 }

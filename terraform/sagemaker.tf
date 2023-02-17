@@ -42,12 +42,13 @@ resource "aws_sagemaker_notebook_instance" "training_notebook_instance" {
   role_arn = aws_iam_role.notebook_iam_role.arn
   instance_type = "ml.t3.medium"
   lifecycle_config_name = aws_sagemaker_notebook_instance_lifecycle_configuration.notebook_config.name
+  volume_size = 5
   //default_code_repository = aws_sagemaker_code_repository.git_repo.code_repository_name
   //Can't insert environment variables, so we have to use the tag to pass the bucket name
   tags = {
     models_bucket = local.models_data_bucket_name
-    num_training_epochs = locals.num_training_epochs
-    num_finetuning_epochs = locals.num_finetuning_epochs
-    batch_size = locals.batch_size
+    num_training_epochs = local.num_training_epochs
+    num_finetuning_epochs = local.num_finetuning_epochs
+    batch_size = local.batch_size
   }
 }

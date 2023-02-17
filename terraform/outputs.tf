@@ -15,7 +15,6 @@ output "vpc_cidr_block" {
 }
 
 // Public Subnets
-
 output "public_subnet_ids" {
   value = module.dev_vpc.public_subnets
 }
@@ -61,7 +60,6 @@ output "nodes_k8s_services" {
 }
 
 //RDS data
-
 output "security_group_rds_id" {
   value = aws_security_group.security_group_rds.id
 }
@@ -84,7 +82,6 @@ output "db_password" {
 }
 
 // Kops data
-
 output "kops_s3_bucket" {
   value = aws_s3_bucket.kops_state.bucket
 }
@@ -97,8 +94,7 @@ output "master_az" {
   value = local.master_az
 }
 
-//Instances data
-
+//Instances config
 output "num_masters" {
   value = local.num_masters
 }
@@ -112,7 +108,6 @@ output "ssh_key_name" {
 }
 
 //Masters config
-
 output "masters_image_id" {
   value = local.masters_image_id
 }
@@ -134,7 +129,6 @@ output "masters_min_size" {
 }
 
 //Nodes config
-
 output "nodes_image_id" {
   value = local.nodes_image_id
 }
@@ -153,4 +147,64 @@ output "nodes_max_size" {
 
 output "nodes_min_size" {
   value = local.nodes_min_size
+}
+
+//Models bucket
+output "models_bucket" {
+  value = local.models_data_bucket_name
+}
+
+//Lambda functions config
+output "training_check_frequency_minutes" {
+  value = local.training_check_frequency_minutes
+}
+
+output "training_check_schedule_lambda_function" {
+  value = aws_lambda_function.training_check_schedule_lambda_function.function_name
+}
+
+output "reported_lambda_function" {
+  value = aws_lambda_function.reported_lambda_function.function_name
+}
+
+//SageMaker instance
+output "sagemaker_instance_name" {
+  value = aws_sagemaker_notebook_instance.training_notebook_instance.name
+}
+
+output "sagemaker_instance_type" {
+  value = aws_sagemaker_notebook_instance.training_notebook_instance.instance_type
+}
+
+output "sagemaker_instance_volume_size" {
+  value = aws_sagemaker_notebook_instance.training_notebook_instance.volume_size
+}
+
+//Training config
+output "min_new_training_data" {
+  value = local.min_new_training_data
+}
+
+output "min_new_validation_data" {
+  value = local.min_new_validation_data
+}
+
+output "min_training_data" {
+  value = local.min_training_data
+}
+
+output "min_validation_data" {
+  value = local.min_validation_data
+}
+
+output "num_training_epochs" {
+  value = local.num_training_epochs
+}
+
+output "num_finetuning_epochs" {
+  value = local.num_finetuning_epochs
+}
+
+output "batch_size" {
+  value = local.batch_size
 }

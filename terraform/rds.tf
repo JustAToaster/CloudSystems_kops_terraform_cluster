@@ -96,7 +96,7 @@ resource "aws_iam_role" "rds_lambda_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "rds_lambda_role_attach" {
+resource "aws_iam_role_policy_attachment" "rds_lambda_role_policy" {
   role       = aws_iam_role.rds_lambda_role.name
   policy_arn = aws_iam_policy.invoke_lambda_policy.arn
 }

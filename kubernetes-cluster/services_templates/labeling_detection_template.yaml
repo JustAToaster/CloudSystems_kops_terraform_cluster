@@ -27,6 +27,8 @@ spec:
           value: {{$.db_password.value}}
         - name: AWS_DEFAULT_REGION
           value: {{$.region.value}}
+        - name: MODELS_BUCKET
+          value: {{$.models_bucket.value}}
         image: justatoaster64/yolov5-labeling-detection-webservice:latest
         name: labeling-detection-app
         imagePullPolicy: Always
