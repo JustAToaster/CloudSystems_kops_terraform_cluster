@@ -36,7 +36,7 @@ resource "aws_security_group" "security_group_rds" {
 
 resource "aws_db_parameter_group" "pg" {
   name   = "rds-pg"
-  family = "aurora-postgresql13"
+  family = "postgres14"
 
   parameter {
     name  = "log_connections"

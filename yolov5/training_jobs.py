@@ -1,4 +1,3 @@
-import boto3
 import json
 import os
 import yaml
@@ -7,6 +6,8 @@ import yaml
 import train
 
 import pickle
+
+import boto3
 
 s3_client = boto3.client('s3')
 s3_resource = boto3.resource('s3')
@@ -52,6 +53,7 @@ def move_pending_model(bucket_name, model_name):
         obj.delete()
 
 if __name__ == "__main__":
+    print("Starting training job script")
     notebook_name, notebook_arn = get_notebook_name_and_arn()
     bucket_name = ''
     num_training_epochs = 100
@@ -122,6 +124,7 @@ if __name__ == "__main__":
         s3_client.upload_file('models/' + model + '/weights/last.pt', bucket_name, 'models/{model}/{model}.pt'.format(model=model))
     
     # DONE!
+    print("Training job done or not necessary. Stopping the notebook instance.")
 
     # Make the notebook instance stop itself
     sagemaker_client.stop_notebook_instance(NotebookInstanceName=notebook_name)

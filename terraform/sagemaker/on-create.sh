@@ -21,11 +21,15 @@ conda activate "$KERNEL_NAME"
 # Installing the default ipykernel required from SageMaker
 pip install --quiet ipykernel
 
-# Cloning yolov5 repository
+echo "Cloning yolov5 repository"
 git clone https://github.com/ultralytics/yolov5
 cd yolov5
-# Installing yolov5 dependencies
+
+echo "Installing YOLOv5 dependencies"
 pip install -r requirements.txt
+
+echo "Installing boto3"
+pip install boto3
 
 echo "Fetching the training jobs script"
 wget https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/training_jobs.py
