@@ -29,6 +29,10 @@ spec:
           value: {{$.region.value}}
         - name: MODELS_BUCKET
           value: {{$.models_bucket.value}}
+        - name: MIN_TRAINING_SET_SIZE
+          value: {{$.min_training_data.value}}
+        - name: MIN_VALIDATION_SET_SIZE
+          value: {{$.min_validation_data.value}}
         image: justatoaster64/yolov5-labeling-detection-webservice:latest
         name: labeling-detection-app
         imagePullPolicy: Always
