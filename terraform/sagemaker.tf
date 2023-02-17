@@ -14,10 +14,15 @@ resource "aws_iam_role" "notebook_iam_role" {
   assume_role_policy = data.aws_iam_policy_document.sm_assume_role_policy.json
 }
 
-resource "aws_iam_policy_attachment" "sm_full_access_attach" {
+//The SageMaker instance needs both S3 access for training data and SageMaker access to stop itself
+resource "aws_iam_policy_attachment" "sm_s3_full_access_attach" {
   name = "sm-full-access-attachment"
   roles = [aws_iam_role.notebook_iam_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+  for_each = toset([
+    "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess", 
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  ])
+  policy_arn = each.value
 }
 
 //Git repositories are checked out after lifecycle scripts: we will just clone the repository inside the script

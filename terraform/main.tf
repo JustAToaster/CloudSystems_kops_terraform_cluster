@@ -21,7 +21,7 @@ locals {
   training_check_frequency_minutes = 30 //Frequency of training lambda function call
 
   # Minimum number of new records for which a model is scheduled for training in the lambda function
-  min_new_training_data = 20
+  min_new_training_data = 16
   min_new_validation_data = 4
 
   # Minimum number of records for which a pending model is scheduled for training in the lambda function
