@@ -25,7 +25,7 @@ pip install --quiet ipykernel
 git clone https://github.com/ultralytics/yolov5
 cd yolov5
 # Installing yolov5 dependencies
-pip install --qr requirements.txt
+pip install -r requirements.txt
 
 echo "Fetching the training jobs script"
 wget https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terraform_cluster/main/yolov5/training_jobs.py
