@@ -42,7 +42,7 @@ locals {
   db_username = var.db_username
   db_password = var.db_password
   allocated_storage = 5
-  instance_class = "db.t2.micro"
+  instance_class = "db.t3.micro"
   ssh_key_name = "dani-keypair-2022"
 
   tags = {
