@@ -20,7 +20,8 @@ resource "aws_iam_policy_attachment" "sm_s3_full_access_attach" {
   roles = [aws_iam_role.notebook_iam_role.name]
   for_each = toset([
     "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess", 
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
   ])
   policy_arn = each.value
 }
@@ -42,6 +43,16 @@ resource "aws_sagemaker_notebook_instance_lifecycle_configuration" "notebook_con
   on_start = filebase64("./sagemaker/on-start.sh")
 }
 
+resource "aws_cloudwatch_log_group" "training_log_group" {
+  name = "JustAToaster_TrainingTasks"
+}
+
+resource "aws_cloudwatch_log_stream" "yolov5_log_stream" {
+  name = "YOLOv5"
+  log_group_name = aws_cloudwatch_log_group.training_log_group.name
+}
+
+
 resource "aws_sagemaker_notebook_instance" "training_notebook_instance" {
   name = "sagemaker-training-notebook"
   role_arn = aws_iam_role.notebook_iam_role.arn
@@ -55,5 +66,7 @@ resource "aws_sagemaker_notebook_instance" "training_notebook_instance" {
     num_training_epochs = local.num_training_epochs
     num_finetuning_epochs = local.num_finetuning_epochs
     batch_size = local.batch_size
+    log_group_name = aws_cloudwatch_log_group.training_log_group.name
+    log_stream_name = aws_cloudwatch_log_stream.yolov5_log_stream.name
   }
 }

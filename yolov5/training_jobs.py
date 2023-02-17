@@ -1,5 +1,8 @@
 import json
 import os
+import shutil
+import time
+
 import yaml
 
 # YOLOv5 training function
@@ -12,6 +15,16 @@ import boto3
 s3_client = boto3.client('s3')
 s3_resource = boto3.resource('s3')
 sagemaker_client = boto3.client('sagemaker')
+logs_client = boto3.client('logs')
+
+log_group_name = ''
+log_stream_name = ''
+
+# Log message to CloudWatch
+def log_message(message):
+    timestamp = int(round(time.time() * 1000))
+    response = logs_client.put_log_events(logGroupName=log_group_name,logStreamName=log_stream_name, logEvents=[{'timestamp': timestamp, 'message': message}])
+    return response
 
 def get_notebook_name_and_arn():
     log_path = '/opt/ml/metadata/resource-metadata.json'
@@ -39,9 +52,9 @@ def download_model_data(bucket_name, model_name, is_pending=False):
         if obj.key[-1] == '/':
             continue
         if os.path.exists(obj.key) and remote_last_modified == int(os.path.getmtime(obj.key)):
-            print("File " + obj.key + " is up to date")
+            log_message("File " + obj.key + " is up to date")
         else:
-            print("Downloading " + obj.key + " from the S3 bucket")
+            log_message("Downloading " + obj.key + " from the S3 bucket")
             bucket.download_file(obj.key, obj.key)
             os.utime(obj.key, (remote_last_modified, remote_last_modified))
 
@@ -51,9 +64,10 @@ def move_pending_model(bucket_name, model_name):
         filename = obj.key.replace('pending_models/' + model_name, '')
         s3_resource.Object(bucket_name, "models/" + model_name + filename).copy_from(CopySource={"Bucket": bucket_name, "Key": obj.key})
         obj.delete()
+    # Move local files too
+    shutil.move('pending_models/' + model_name, 'models/' + model_name)
 
 if __name__ == "__main__":
-    print("Starting training job script")
     notebook_name, notebook_arn = get_notebook_name_and_arn()
     bucket_name = ''
     num_training_epochs = 100
@@ -63,11 +77,17 @@ if __name__ == "__main__":
         if tag['Key'] == 'models_bucket':
             bucket_name = tag['Value']
         if tag['Key'] == 'num_training_epochs':
-            bucket_name = int(tag['Value'])
+            num_training_epochs = int(tag['Value'])
         if tag['Key'] == 'num_finetuning_epochs':
-            bucket_name = int(tag['Value'])
+            num_finetuning_epochs = int(tag['Value'])
         if tag['Key'] == 'batch_size':
-            bucket_name = int(tag['Value'])
+            batch_size = int(tag['Value'])
+        if tag['Key'] == 'log_group_name':
+            log_group_name = int(tag['Value'])
+        if tag['Key'] == 'log_stream_name':
+            log_stream_name = int(tag['Value'])
+
+    log_message("Starting training job...")
 
     s3_client.download_file('pending_models_job.txt', bucket_name, 'pending_models_job.txt')
     s3_client.download_file('models_job.txt', bucket_name, 'models_job.txt')
@@ -79,9 +99,12 @@ if __name__ == "__main__":
         models_to_train = [line.strip() for line in list(filter(None, file.read().split('\n')))]
 
     for pending_model in pending_models_to_train:
+        log_message("Downloading data for pending model " + pending_model)
         download_model_data(bucket_name, pending_model, is_pending=True)
         # Train starting from YOLOv5s model with COCO weights
+        log_message("Starting training job for pending model " + pending_model)
         train.run(batch_size=batch_size, epochs=num_training_epochs, data='./pending_models/{model}/{model}.yaml'.format(model=pending_model), weights='yolov5s.pt', project=pending_model, name='', exist_ok=True, nosave=True)
+        log_message("Training job for pending model " + pending_model + "done!")
         with open ('val_APs.pickle', 'rb') as fp:
             val_APs = pickle.load(fp)
         
@@ -102,10 +125,13 @@ if __name__ == "__main__":
         s3_client.upload_file('pending_models/' + pending_model + '/weights/last.pt', bucket_name, 'models/{model}/{model}.pt'.format(model=pending_model))
 
     for model in models_to_train:
+        log_message("Downloading data for model " + model)
         download_model_data(bucket_name, pending_model, is_pending=False)
         # Finetune from pre-existing model pt
+        log_message("Starting fine-tuning for model " + model)
         train.run(batch_size=batch_size, epochs=num_finetuning_epochs, data='./models/{model}/{model}.yaml'.format(model=model), weights='./models/{model}/{model}.pt'.format(model=model), project=model, name='', exist_ok=True, nosave=True, noval=True)
-        
+        log_message("Fine-tuning for model " + model + "done!")
+
         with open ('val_APs.pickle', 'rb') as fp:
             val_APs = pickle.load(fp)
         
@@ -124,7 +150,11 @@ if __name__ == "__main__":
         s3_client.upload_file('models/' + model + '/weights/last.pt', bucket_name, 'models/{model}/{model}.pt'.format(model=model))
     
     # DONE!
-    print("Training job done or not necessary. Stopping the notebook instance.")
+    log_message("All training jobs are done!")
+    # Wait until the notebook instance becomes InService before trying to stop it
+    while sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_name)["NotebookInstanceStatus"] != "InService":
+        log_message("SageMaker instance is still not in service...")
+        time.sleep(30)
 
-    # Make the notebook instance stop itself
+    log_message("Stopping SageMaker instance...")
     sagemaker_client.stop_notebook_instance(NotebookInstanceName=notebook_name)

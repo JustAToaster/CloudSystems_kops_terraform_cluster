@@ -27,11 +27,5 @@ wget -c https://raw.githubusercontent.com/JustAToaster/CloudSystems_kops_terrafo
 # echo "Stopping the notebook instance"
 # NOTEBOOK_INSTANCE_NAME=$(jq '.ResourceName' /opt/ml/metadata/resource-metadata.json --raw-output)
 # aws sagemaker stop-notebook-instance --notebook-instance-name $NOTEBOOK_INSTANCE_NAME
-
-echo "Creating stop instance script"
-cat >stop.sh <<'ENDSTOP'
-#!/usr/bin/env bash
-aws sagemaker stop-notebook-instance --notebook-instance-name $(jq '.ResourceName' /opt/ml/metadata/resource-metadata.json --raw-output)
-ENDSTOP
-
+echo "Terminating on create lifecycle script"
 EOF
