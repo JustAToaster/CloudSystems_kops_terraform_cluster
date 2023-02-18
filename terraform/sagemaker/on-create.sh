@@ -6,7 +6,6 @@ sudo -u ec2-user -i << 'EOF'
 
 echo "Going to SageMaker directory"
 cd /home/ec2-user/SageMaker/
-mkdir envs
 
 echo "Cloning yolov5 repository"
 git clone https://github.com/ultralytics/yolov5
