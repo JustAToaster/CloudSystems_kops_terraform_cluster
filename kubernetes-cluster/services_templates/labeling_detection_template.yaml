@@ -20,19 +20,19 @@ spec:
       containers:
       - env:
         - name: DB_HOSTNAME
-          value: {{$.rds_address.value}}
+          value: "{{$.rds_address.value}}"
         - name: DB_USERNAME
-          value: {{$.db_username.value}}
+          value: "{{$.db_username.value}}"
         - name: DB_PASSWORD
-          value: {{$.db_password.value}}
+          value: "{{$.db_password.value}}"
         - name: AWS_DEFAULT_REGION
-          value: {{$.region.value}}
+          value: "{{$.region.value}}"
         - name: MODELS_BUCKET
-          value: {{$.models_bucket.value}}
+          value: "{{$.models_bucket.value}}"
         - name: MIN_TRAINING_SET_SIZE
-          value: {{$.min_training_data.value}}
+          value: "{{$.min_training_data.value}}"
         - name: MIN_VALIDATION_SET_SIZE
-          value: {{$.min_validation_data.value}}
+          value: "{{$.min_validation_data.value}}"
         image: justatoaster64/yolov5-labeling-detection-webservice:latest
         name: labeling-app
         imagePullPolicy: Always

@@ -20,11 +20,11 @@ spec:
       containers:
       - env:
         - name: DB_HOSTNAME
-          value: {{$.rds_address.value}}
+          value: "{{$.rds_address.value}}"
         - name: DB_USERNAME
-          value: {{$.db_username.value}}
+          value: "{{$.db_username.value}}"
         - name: DB_PASSWORD
-          value: {{$.db_password.value}}
+          value: "{{$.db_password.value}}"
         image: justatoaster64/yolov5-helmet-detector:latest
         name: helmet-app
         imagePullPolicy: Always
