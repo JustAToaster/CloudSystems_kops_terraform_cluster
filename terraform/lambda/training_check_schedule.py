@@ -49,9 +49,15 @@ def get_current_dataset_size_yaml(model_name, is_pending=False):
 def get_models_list(s3_client, s3_resource, bucket_name):
     bucket = s3_resource.Bucket(bucket_name)
     result = s3_client.list_objects(Bucket=bucket.name, Prefix='pending_models/', Delimiter='/')
-    pending_models_list = [o.get('Prefix').split('/')[1] for o in result.get('CommonPrefixes')]
+    common_prefixes = result.get('CommonPrefixes')
+    pending_models_list = []
+    models_list = []
+    if common_prefixes:
+        pending_models_list = [o.get('Prefix').split('/')[1] for o in common_prefixes]
     result = s3_client.list_objects(Bucket=bucket.name, Prefix='models/', Delimiter='/')
-    models_list = [o.get('Prefix').split('/')[1] for o in result.get('CommonPrefixes')]
+    common_prefixes = result.get('CommonPrefixes')
+    if common_prefixes:
+        models_list = [o.get('Prefix').split('/')[1] for o in result.get('CommonPrefixes')]
     return pending_models_list, models_list
 
 def get_models_to_train(s3_client, models_list, bucket_name):
