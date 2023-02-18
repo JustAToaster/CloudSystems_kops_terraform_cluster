@@ -105,7 +105,7 @@ def handler(event, context):
     bucket_name = os.environ['models_bucket']
 
     pending_models_list, models_list = get_models_list(s3_client, s3_resource, bucket_name)
-    download_yamls_from_s3(s3_client, models_list, 'pending_models/', bucket_name)
+    download_yamls_from_s3(s3_client, pending_models_list, 'pending_models/', bucket_name)
     download_yamls_from_s3(s3_client, models_list, 'models/', bucket_name)
     pending_models_to_train = get_pending_models_to_train(s3_client, pending_models_list, bucket_name)
     models_to_train = get_models_to_train(s3_client, models_list, bucket_name)
