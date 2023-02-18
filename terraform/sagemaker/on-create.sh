@@ -8,7 +8,7 @@ echo "Cloning yolov5 repository"
 git clone https://github.com/ultralytics/yolov5
 cd yolov5
 
-conda activate python3
+source activate pytorch_p39
 
 echo "Installing YOLOv5 dependencies"
 pip install -r requirements.txt

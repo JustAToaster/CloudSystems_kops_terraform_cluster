@@ -81,17 +81,17 @@ def get_pending_models_to_train(s3_client, pending_models_list, bucket_name):
 
 def write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train):
     pending_models_filename = 'pending_models_job.txt'
-    with open(pending_models_filename, 'w') as pending_models_file:
+    with open('/tmp/' + pending_models_filename, 'w') as pending_models_file:
         for pending_model in pending_models_to_train:
             pending_models_file.write(pending_model + "\n")
 
     models_filename = 'models_job.txt'
-    with open(models_filename, 'w') as models_file:
+    with open('/tmp/' + models_filename, 'w') as models_file:
         for model in models_to_train:
             models_file.write(model + "\n")
     
-    s3_client.upload_file(pending_models_filename, bucket_name, pending_models_filename)
-    s3_client.upload_file(models_filename, bucket_name, models_filename)
+    s3_client.upload_file('/tmp/' + pending_models_filename, bucket_name, pending_models_filename)
+    s3_client.upload_file('/tmp/' + models_filename, bucket_name, models_filename)
 
 def handler(event, context):
     s3_client = boto3.client("s3")

@@ -28,6 +28,14 @@ resource "aws_security_group" "security_group_rds" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  //Output to lambda
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name = "Security Group RDS"
   }
