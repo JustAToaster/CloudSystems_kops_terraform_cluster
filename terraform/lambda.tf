@@ -22,8 +22,8 @@ resource "aws_iam_role" "iam_for_reported_lambda" {
 }
 
 # Give full S3 access to the rds lambda function
-resource "aws_iam_role_policy_attachment" "training_lambda_role_attach" {
-  role       = aws_iam_role.iam_for_training_lambda.name
+resource "aws_iam_role_policy_attachment" "rds_lambda_role_attach" {
+  role       = aws_iam_role.iam_for_reported_lambda.name
   for_each = toset([
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
     "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"

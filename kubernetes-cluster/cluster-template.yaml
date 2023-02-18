@@ -42,7 +42,7 @@ spec:
   kubernetesApiAccess:
   - 0.0.0.0/0
   - ::/0
-  kubernetesVersion: 1.23.8
+  kubernetesVersion: 1.25.3
   masterPublicName: api.{{.kubernetes_cluster_name.value}}
   networkCIDR: {{.vpc_cidr_block.value}}
   networkID: {{.vpc_id.value}}
@@ -82,7 +82,7 @@ spec:
   instanceMetadata:
     httpPutResponseHopLimit: 3
     httpTokens: required
-  kubernetesVersion: 1.23.8
+  kubernetesVersion: 1.25.3
   machineType: {{$.masters_machine_type.value}}
   maxSize: {{$.masters_max_size.value}}
   minSize: {{$.masters_min_size.value}}
@@ -112,7 +112,7 @@ spec:
   instanceMetadata:
     httpPutResponseHopLimit: 1
     httpTokens: required
-  kubernetesVersion: 1.23.8
+  kubernetesVersion: 1.25.3
   machineType: {{$.nodes_machine_type.value}}
   maxSize: {{$.nodes_max_size.value}}
   minSize: {{$.nodes_min_size.value}}
