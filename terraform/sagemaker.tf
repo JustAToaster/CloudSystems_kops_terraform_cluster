@@ -15,9 +15,8 @@ resource "aws_iam_role" "notebook_iam_role" {
 }
 
 //The SageMaker instance needs both S3 access for training data and SageMaker access to stop itself
-resource "aws_iam_policy_attachment" "sm_s3_full_access_attach" {
-  name = "sm-full-access-attachment"
-  roles = [aws_iam_role.notebook_iam_role.name]
+resource "aws_iam_role_policy_attachment" "sm_s3_full_access_attach" {
+  role = aws_iam_role.notebook_iam_role.name
   for_each = toset([
     "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess", 
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
