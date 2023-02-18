@@ -110,17 +110,18 @@ def handler(event, context):
     pending_models_to_train = get_pending_models_to_train(s3_client, pending_models_list, bucket_name)
     models_to_train = get_models_to_train(s3_client, models_list, bucket_name)
 
-    # Communicate to the SageMaker instance through training job files on S3 (avoid setting up a server or recomputing the models to train)
-    write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train)
-    
-    sagemaker_client = boto3.client("sagemaker")
-
-    response = sagemaker_client.start_notebook_instance(NotebookInstanceName=os.environ['sagemaker_instance_name'])
+    response = None
+    # If there is at least a single model to train, start notebook instance
+    if pending_models_to_train or models_to_train:
+        # Communicate to the SageMaker instance through training job files on S3 (avoid setting up a server or recomputing the models to train)
+        write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train)
+        sagemaker_client = boto3.client("sagemaker")
+        response = sagemaker_client.start_notebook_instance(NotebookInstanceName=os.environ['sagemaker_instance_name'])
 
     return {
         "lambda_request_id": context.aws_request_id,
         "lambda_arn": context.invoked_function_arn,
         "status_code": HTTPStatus.OK.value,
-        "event": event.json(),
+        "event": event,
         "response": response
     }

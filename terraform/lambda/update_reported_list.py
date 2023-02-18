@@ -17,6 +17,6 @@ def handler(event, context):
         "lambda_request_id": context.aws_request_id,
         "lambda_arn": context.invoked_function_arn,
         "status_code": HTTPStatus.OK.value,
-        "event": event.json(),
+        "event": event,
         "response": response
     }
