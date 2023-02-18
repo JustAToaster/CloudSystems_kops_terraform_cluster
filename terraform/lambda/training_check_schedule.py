@@ -22,17 +22,17 @@ def count_updated_dataset_size(s3_client, bucket_name, model_path):
 
 def download_yamls_from_s3(s3_client, models_list, s3_folder, bucket_name):
     for model in models_list:
-        if not os.path.exists(s3_folder + model):
-            os.makedirs(s3_folder + model)
+        if not os.path.exists('/tmp/' + s3_folder + model):
+            os.makedirs('/tmp/' + s3_folder + model)
         # Download model data
-        s3_client.download_file(s3_folder + model + '/' + model + '.yaml', bucket_name, s3_folder + model + '/' + model + '.yaml')
+        s3_client.download_file(bucket_name, s3_folder + model + '/' + model + '.yaml', '/tmp/' + s3_folder + model + '/' + model + '.yaml')
 
 def get_current_dataset_size_yaml(model_name, is_pending=False):
     model_folder_prefix = ''
     if is_pending:
         model_folder_prefix = 'pending_'
     current_training_set_size, current_validation_set_size = 0, 0
-    yaml_path = model_folder_prefix + 'models/' + model_name + '/' + model_name + '.yaml'
+    yaml_path = '/tmp/' + model_folder_prefix + 'models/' + model_name + '/' + model_name + '.yaml'
     size_found = 0
     with open(yaml_path, 'r') as yaml_file:
         for line in yaml_file:
@@ -49,9 +49,9 @@ def get_current_dataset_size_yaml(model_name, is_pending=False):
 def get_models_list(s3_client, s3_resource, bucket_name):
     bucket = s3_resource.Bucket(bucket_name)
     result = s3_client.list_objects(Bucket=bucket.name, Prefix='pending_models/', Delimiter='/')
-    common_prefixes = result.get('CommonPrefixes')
     pending_models_list = []
     models_list = []
+    common_prefixes = result.get('CommonPrefixes')
     if common_prefixes:
         pending_models_list = [o.get('Prefix').split('/')[1] for o in common_prefixes]
     result = s3_client.list_objects(Bucket=bucket.name, Prefix='models/', Delimiter='/')
