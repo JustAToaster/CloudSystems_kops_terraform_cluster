@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: labeling-detection-app-deployment
+  name: labeling-app-deployment
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -11,11 +11,11 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: labeling-detection-app
+      app: labeling-app
   template:
     metadata:
       labels:
-        app: labeling-detection-app
+        app: labeling-app
     spec:      
       containers:
       - env:
@@ -34,7 +34,7 @@ spec:
         - name: MIN_VALIDATION_SET_SIZE
           value: {{$.min_validation_data.value}}
         image: justatoaster64/yolov5-labeling-detection-webservice:latest
-        name: labeling-detection-app
+        name: labeling-app
         imagePullPolicy: Always
         ports:
           - containerPort: 32332
@@ -49,7 +49,7 @@ kind: Service
 apiVersion: v1
 
 metadata:
-  name: labeling-detection-elb
+  name: labeling-elb
   namespace: default
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
@@ -57,7 +57,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: labeling-detection-app
+    app: labeling-app
   ports:
     - name: http
       port: 32332

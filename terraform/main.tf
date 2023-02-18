@@ -11,11 +11,11 @@ terraform {
 }
 
 locals {
-  azs                    = ["us-east-1a", "us-east-1b"]
+  azs = ["us-east-1a", "us-east-1b"]
   //Because of free tier limitations (bandwidth between AZs), the nodes will actually be created in the same AZ as the master and the RDS instance
-  nodes_azs                    = ["us-east-1a"]
-  master_az                    = "us-east-1a"
-  environment            = "dev-kops-proj"
+  nodes_azs = ["us-east-1a"]
+  master_az = "us-east-1a"
+  environment = "dev-kops-proj"
   kops_state_bucket_name = "kops-config-s3"
   models_data_bucket_name = "justatoaster-yolov5-models"
   training_check_frequency_minutes = 30 //Frequency of training lambda function call

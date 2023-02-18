@@ -71,23 +71,6 @@ resource "aws_db_instance" "projdb" {
   skip_final_snapshot    = true
 }
 
-resource "aws_iam_policy" "invoke_lambda_policy" {
-  name        = "invoke_lambda_policy"
-  path        = "/"
-  description = "A policy for granting permission to invoke a Lambda function from the RDS instance."
-
-  policy      = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "lambda:InvokeFunction"
-        Effect   = "Allow"
-        Resource = "arn:aws:lambda:*:123456789123:function:*"
-      },
-    ]
-  })
-}
-
 resource "aws_iam_role" "rds_lambda_role" {
   name               = "rds_lambda_role"
   assume_role_policy = jsonencode({
@@ -106,7 +89,7 @@ resource "aws_iam_role" "rds_lambda_role" {
 
 resource "aws_iam_role_policy_attachment" "rds_lambda_role_policy" {
   role       = aws_iam_role.rds_lambda_role.name
-  policy_arn = aws_iam_policy.invoke_lambda_policy.arn
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
 }
 
 resource "aws_db_instance_role_association" "rds_lambda_role_attach" {

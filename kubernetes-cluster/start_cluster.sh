@@ -70,7 +70,7 @@ echo "If some nodes do not show up after 10 minutes, do a rolling update with ./
 
 # Create the tables used by the services for logging
 echo "----------- Connecting to the RDS instance to create tables and triggers -----------"
-PGPASSWORD=$(terraform output -raw db_password) psql -h $(terraform output -raw rds_address) -p $(terraform output -raw rds_port) -U $(terraform output -raw db_username) -f "../sql/init_db.sql"
+PGPASSWORD=$(terraform output -raw db_password) psql --host=$(terraform output -raw rds_address) --port=$(terraform output -raw rds_port) --username=$(terraform output -raw db_username) --dbname=postgres -f "../sql/init_db.sql"
 echo "Done."
 # You can connect to the EC2 instances with:
 # ssh ubuntu@ec2-[public_ip].compute-1.amazonaws.com

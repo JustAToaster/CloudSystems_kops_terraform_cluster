@@ -21,6 +21,16 @@ resource "aws_iam_role" "iam_for_reported_lambda" {
   })
 }
 
+# Give full S3 access to the rds lambda function
+resource "aws_iam_role_policy_attachment" "training_lambda_role_attach" {
+  role       = aws_iam_role.iam_for_training_lambda.name
+  for_each = toset([
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+  ])
+  policy_arn = each.value
+}
+
 resource "aws_lambda_function" "reported_lambda_function" {
   function_name = "update_reported_list"
   filename         = data.archive_file.reported_lambda_function_archive.output_path
@@ -58,10 +68,15 @@ resource "aws_iam_role" "iam_for_training_lambda" {
   })
 }
 
-# Give full SageMaker access to the training schedule lambda function
-resource "aws_iam_role_policy_attachment" "rds_lambda_role_attach" {
+# Give full SageMaker and S3 access to the training schedule lambda function
+resource "aws_iam_role_policy_attachment" "training_lambda_role_attach" {
   role       = aws_iam_role.iam_for_training_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+  for_each = toset([
+    "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess", 
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+  ])
+  policy_arn = each.value
 }
 
 resource "aws_lambda_function" "training_check_schedule_lambda_function" {
