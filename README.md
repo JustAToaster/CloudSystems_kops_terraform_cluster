@@ -1,4 +1,4 @@
-# CloudSystems_kops_terraform_cluster
+# AWS kOps and Terraform cluster for YOLOv5 object detection models training, inference and fine-tuning
 Cloud Systems project 2021/22 and later improved upon for my Computer Science Master's Thesis.
 
 ## Introduction
