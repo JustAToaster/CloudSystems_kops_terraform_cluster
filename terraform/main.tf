@@ -28,11 +28,12 @@ locals {
   min_training_data = 80
   min_validation_data = 20
 
-  # Number of epochs for training on the SageMaker instance
-  num_training_epochs = 100
-  num_finetuning_epochs = 20
+  # Number of epochs for training on the SageMaker instance (low on purpose because of testing purposes, and the free tier notebook instance is not powerful at all)
+  num_training_epochs = 10
+  num_finetuning_epochs = 3
 
-  batch_size = 16
+  # Again, low value because the notebook instance is bad, and higher values crash the training procedure
+  batch_size = 4
 
   kubernetes_cluster_name = "terraform-kops-proj.k8s.local"
   ingress_ips             = ["10.0.0.100/32", "10.0.0.101/32"]

@@ -104,7 +104,7 @@ if __name__ == "__main__":
         # Train starting from YOLOv5s model with COCO weights
         log_message("Starting training job for pending model " + pending_model)
         train.run(batch_size=batch_size, epochs=num_training_epochs, data='{model}/{model}.yaml'.format(model=pending_model), weights='yolov5s.pt', project=pending_model, name='', exist_ok=True, nosave=True)
-        log_message("Training job for pending model " + pending_model + "done!")
+        log_message("Training job for pending model " + pending_model + " done!")
         with open ('val_APs.pickle', 'rb') as fp:
             val_APs = pickle.load(fp)
         
@@ -117,11 +117,10 @@ if __name__ == "__main__":
         with open('{model}/{model}.yaml'.format(model=pending_model), 'w') as file:
             yaml.dump(model_data, file)
         
-        # Remove model from pending models in S3
+        log_message("Remove model from pending models in S3")
         move_pending_model(bucket_name, pending_model)
-        # Upload new yaml
+        log_message("Upload YAML and weights to S3")
         s3_client.upload_file('{model}/{model}.yaml'.format(model=pending_model), bucket_name, 'models/{model}/{model}.yaml'.format(model=pending_model))
-        # Upload actual model with weights
         s3_client.upload_file(pending_model + '/weights/last.pt', bucket_name, 'models/{model}/{model}.pt'.format(model=pending_model))
 
     for model in models_to_train:
@@ -145,9 +144,9 @@ if __name__ == "__main__":
         with open('{model}/{model}.yaml'.format(model=model), 'w') as file:
             yaml.dump(model_data, file)
 
-        # Upload new yaml
+        log_message("Upload new YAML to S3")
         s3_client.upload_file('{model}/{model}.yaml'.format(model=model), bucket_name, 'models/{model}/{model}.yaml'.format(model=model))
-        # Upload actual model with weights
+        log_message("Upload new weights in S3")
         s3_client.upload_file(model + '/weights/last.pt', bucket_name, 'models/{model}/{model}.pt'.format(model=model))
     
     # DONE!

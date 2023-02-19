@@ -28,6 +28,7 @@ BEGIN
             RETURN NEW;
         END IF;
     END IF;
+    RETURN NULL;
 END
 $$;
 
@@ -39,12 +40,12 @@ $$
 DECLARE
     ScoreThreshold constant float := 0.7;
 BEGIN
-    INSERT INTO yolov5_predictions.users (UserAddress, NumAccesses, SuspiciousRequests, TotalScore) VALUES (
-    NEW.UserAddress, 0, 0, 0.0) ON CONFLICT (UserAddress) DO NOTHING;
-    UPDATE yolov5_predictions.users SET (NumAccesses, TotalScore) = (NumAccesses+1, TotalScore+NEW.CustomizationScore) WHERE UserAddress = NEW.UserAddress;
+    INSERT INTO yolov5_predictions.users (UserAddress, NumAccesses, SuspiciousRequests, TotalScore) VALUES (NEW.UserAddress, 0, 0, 0.0) ON CONFLICT (UserAddress) DO NOTHING;
+    UPDATE yolov5_predictions.users SET (NumAccesses, TotalScore) = (NumAccesses+1, TotalScore+NEW.CustomizationScore) WHERE yolov5_predictions.users.UserAddress = NEW.UserAddress;
     IF (NEW.CustomizationScore > ScoreThreshold) THEN
-        UPDATE yolov5_predictions.users SET (SuspiciousRequests) = (SuspiciousRequests+1) WHERE UserAddress = NEW.UserAddress;
+        UPDATE yolov5_predictions.users SET SuspiciousRequests = SuspiciousRequests+1 WHERE yolov5_predictions.users.UserAddress = NEW.UserAddress;
     END IF;
+    RETURN NULL;
 END
 $$;
 

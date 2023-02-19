@@ -103,7 +103,18 @@ def handler(event, context):
     s3_client = boto3.client("s3")
     s3_resource = boto3.resource("s3")
     bucket_name = os.environ['models_bucket']
+    sagemaker_instance_name = os.environ['sagemaker_instance_name']
     print("Starting training check schedule")
+    if sagemaker_client.describe_notebook_instance(NotebookInstanceName=sagemaker_instance_name)["NotebookInstanceStatus"] == "InService":
+        print("A training job is under way, stopping lambda function")
+        
+        return {
+            "lambda_request_id": context.aws_request_id,
+            "lambda_arn": context.invoked_function_arn,
+            "status_code": HTTPStatus.OK.value,
+            "event": event,
+            "response": None
+        }
 
     pending_models_list, models_list = get_models_list(s3_client, s3_resource, bucket_name)
     download_yamls_from_s3(s3_client, pending_models_list, 'pending_models/', bucket_name)
@@ -118,7 +129,7 @@ def handler(event, context):
         write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train)
         sagemaker_client = boto3.client("sagemaker")
         print("Models to train were found. Starting SageMaker notebook instance.")
-        response = sagemaker_client.start_notebook_instance(NotebookInstanceName=os.environ['sagemaker_instance_name'])
+        response = sagemaker_client.start_notebook_instance(NotebookInstanceName=sagemaker_instance_name)
     else:
         print("No models to train found.")
 
