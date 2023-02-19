@@ -116,7 +116,10 @@ def handler(event, context):
         # Communicate to the SageMaker instance through training job files on S3 (avoid setting up a server or recomputing the models to train)
         write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train)
         sagemaker_client = boto3.client("sagemaker")
+        print("Models to train were found. Starting SageMaker notebook instance.")
         response = sagemaker_client.start_notebook_instance(NotebookInstanceName=os.environ['sagemaker_instance_name'])
+    else:
+        print("No models to train found.")
 
     return {
         "lambda_request_id": context.aws_request_id,

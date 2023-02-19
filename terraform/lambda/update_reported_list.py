@@ -13,6 +13,7 @@ def handler(event, context):
     with open('/tmp/' + report_file_name, 'a') as report_file:
                 report_file.write(event['UserAddress'] + "\t" + event['reported_at'] + "\n")
     response = s3_client.upload_file('/tmp/' + report_file_name, bucket_name, report_file_name)
+    print("User with address " + event['UserAddress'] + " was banned at " + event['reported_at'])
     return {
         "lambda_request_id": context.aws_request_id,
         "lambda_arn": context.invoked_function_arn,
