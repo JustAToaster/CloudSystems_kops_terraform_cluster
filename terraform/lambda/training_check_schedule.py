@@ -103,6 +103,7 @@ def handler(event, context):
     s3_client = boto3.client("s3")
     s3_resource = boto3.resource("s3")
     bucket_name = os.environ['models_bucket']
+    print("Starting training check schedule")
 
     pending_models_list, models_list = get_models_list(s3_client, s3_resource, bucket_name)
     download_yamls_from_s3(s3_client, pending_models_list, 'pending_models/', bucket_name)
