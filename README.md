@@ -7,7 +7,8 @@ This project uses Terraform to define a Kubernetes cluster on AWS associated wit
 Terraform handles the creation of the RDS instance, the SageMaker notebook instance, the two lambda functions, the VPC, security groups, S3 buckets, while the actual k8s cluster is created by kOps: values are extracted with Terraform output and applied with kOps cluster templating to the YAML templates.
 
 ## Usage
-Install [**Terraform**](https://learn.hashicorp.com/tutorials/terraform/install-cli) and [**kOps**](https://kops.sigs.k8s.io/getting_started/install/), together with the [**AWS CLI**](https://aws.amazon.com/cli/) if you haven't already, then execute the **start_cluster.sh** script in **kubernetes_cluster**.
+Install [**Terraform**](https://learn.hashicorp.com/tutorials/terraform/install-cli) and [**kOps**](https://kops.sigs.k8s.io/getting_started/install/), together with the [**AWS CLI**](https://aws.amazon.com/cli/) if you haven't already. In addition to the ones described in the kOps guide, the kops user also needs full CloudWatch, Lambda and SageMaker access.
+To deploy the infrastructure to AWS execute the **start_cluster.sh** script in **kubernetes_cluster**.
 
 You will be prompted multiple times to assign values to the DB username and password variables. Once the Terraform part ends, the K8S cluster creation will start and it might take up to 15 minutes for all nodes to be ready.
 
