@@ -43,7 +43,7 @@ resource "aws_lambda_function" "reported_lambda_function" {
       models_bucket = local.models_data_bucket_name
     }
   }
-  # Increate time limit (default is 3 seconds, too low)
+  # Increase time limit (default is 3 seconds, too low)
   timeout = 180
 }
 
@@ -100,7 +100,7 @@ resource "aws_lambda_function" "training_check_schedule_lambda_function" {
       sagemaker_instance_name = aws_sagemaker_notebook_instance.training_notebook_instance.name
     }
   }
-  # Increate time limit (default is 3 seconds, too low)
+  # Increase time limit (default is 3 seconds, too low)
   timeout = 180
 }
 
