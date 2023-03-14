@@ -105,6 +105,7 @@ def handler(event, context):
     bucket_name = os.environ['models_bucket']
     sagemaker_instance_name = os.environ['sagemaker_instance_name']
     print("Starting training check schedule")
+    sagemaker_client = boto3.client("sagemaker")
     if sagemaker_client.describe_notebook_instance(NotebookInstanceName=sagemaker_instance_name)["NotebookInstanceStatus"] == "InService":
         print("A training job is under way, stopping lambda function")
         
@@ -127,7 +128,6 @@ def handler(event, context):
     if pending_models_to_train or models_to_train:
         # Communicate to the SageMaker instance through training job files on S3 (avoid setting up a server or recomputing the models to train)
         write_training_job_to_s3(s3_client, bucket_name, pending_models_to_train, models_to_train)
-        sagemaker_client = boto3.client("sagemaker")
         print("Models to train were found. Starting SageMaker notebook instance.")
         response = sagemaker_client.start_notebook_instance(NotebookInstanceName=sagemaker_instance_name)
     else:
