@@ -32,14 +32,6 @@ def get_notebook_name_and_arn():
         _logs = json.load(logs)
     return _logs['ResourceName'], _logs['ResourceArn']
 
-def read_model_data_yaml(model_name, is_pending=False):
-    model_folder_prefix = ''
-    if is_pending:
-        model_folder_prefix = 'pending_'
-    with open(model_folder_prefix + 'models/' + model_name + '/' + model_name + '.yaml', 'r') as file:
-        model_data = yaml.full_load(file)
-    return model_data
-
 def download_model_data(bucket_name, model_name, is_pending=False):
     bucket = s3_resource.Bucket(bucket_name)
     model_prefix = ''
@@ -108,7 +100,8 @@ if __name__ == "__main__":
         with open ('val_APs.pickle', 'rb') as fp:
             val_APs = pickle.load(fp)
         
-        model_data = read_model_data_yaml(pending_model, is_pending=True)
+        with open('{model}/{model}.yaml'.format(model=pending_model), 'r') as file:
+            model_data = yaml.full_load(file)
         model_data['training_set_size'] = len(os.listdir(pending_model + '/labels/train/'))
         model_data['validation_set_size'] = len(os.listdir(pending_model + '/labels/valid/'))
         model_data['validation_APs'] = val_APs.tolist()
@@ -135,7 +128,8 @@ if __name__ == "__main__":
         with open ('val_APs.pickle', 'rb') as fp:
             val_APs = pickle.load(fp)
         
-        model_data = read_model_data_yaml(model, is_pending=False)
+        with open('{model}/{model}.yaml'.format(model=model), 'r') as file:
+            model_data = yaml.full_load(file)
         model_data['training_set_size'] = len(os.listdir(model + '/labels/train/'))
         model_data['validation_set_size'] = len(os.listdir(model + '/labels/valid/'))
         model_data['validation_APs'] = val_APs.tolist()
@@ -151,6 +145,15 @@ if __name__ == "__main__":
     
     # DONE!
     log_message("All training jobs are done!")
+
+    # Write empty job files
+    with open('pending_models_job.txt', 'w') as file:
+                    file.write("")
+    with open('models_job.txt', 'w') as file:
+                    file.write("")
+    s3_client.upload_file('pending_models_job.txt', bucket_name, 'pending_models_job.txt')
+    s3_client.upload_file('models_job.txt', bucket_name, 'models_job.txt')
+    
     # Wait until the notebook instance becomes InService before trying to stop it
     while sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_name)["NotebookInstanceStatus"] != "InService":
         log_message("SageMaker instance is still not in service...")
